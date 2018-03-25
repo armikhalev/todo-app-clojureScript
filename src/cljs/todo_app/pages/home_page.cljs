@@ -5,12 +5,14 @@
 
 (defonce app-state (r/atom {:tasks (hash-map)}))
 
-(defn delete-task [id title]
+(defn delete [tasks id] (swap! tasks dissoc id))
+
+(defn delete-task [tasks id]
   [:button
    {:style {:margin 10
             :padding 10
             :fontWeight "bold"}
-    }
+    :on-click #(delete tasks id)}
    "Delete me"])
 
 (defn task-list-comp [tasks]
@@ -18,7 +20,7 @@
    (for [[id {done :done title :title}] @tasks]
      ^{:key id}
      [:li title
-      [delete-task id title]])])
+      [delete-task tasks id]])])
 
 (defn task-input-comp [tasks]
   (let [task-input (r/atom "")]
