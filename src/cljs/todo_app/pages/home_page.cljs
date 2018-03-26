@@ -1,27 +1,35 @@
 (ns todo-app.pages.home-page
   (:require [reagent.core :as r]))
 
+;; GLOBALS
 (defonce counter (r/atom 0))
 
 (defonce app-state (r/atom {:tasks (hash-map)}))
 
-(defn delete [tasks id] (swap! tasks dissoc id))
+;; CHECKBOX
+(defn checkbox [tasks id done]
+  [:input {:type "checkbox" :checked done
+           :on-change #(swap! tasks update-in [id :done] not)}])
 
+;; DELETE
 (defn delete-task [tasks id]
   [:button
    {:style {:margin 10
             :padding 10
             :fontWeight "bold"}
-    :on-click #(delete tasks id)}
+    :on-click #(swap! tasks dissoc id)}
    "Delete me"])
 
+;; LIST ITEMS
 (defn task-list-comp [tasks]
   [:ul
    (for [[id {done :done title :title}] @tasks]
      ^{:key id}
      [:li title
-      [delete-task tasks id]])])
+      [checkbox tasks id]
+      [delete-task tasks id done]])])
 
+;; INPUT
 (defn task-input-comp [tasks]
   (let [task-input (r/atom "")]
     (fn [tasks]
@@ -40,6 +48,7 @@
              (reset! task-input "")
              (.preventDefault e)))} ]])))
 
+;; MAIN
 (defn home-page []
   [:div 
    [:h2 "Welcometh to todo-app"]
