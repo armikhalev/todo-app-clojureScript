@@ -20,14 +20,43 @@
     :on-click #(swap! tasks dissoc id)}
    "Delete me"])
 
+;; EDIT
+(defn edit-item [tasks id edit?]
+  (let [task-input (r/atom "")]
+    (fn [tasks]
+       [:input
+        {:type "text"
+         :placeholder "Edit task"
+         :value @task-input
+         :on-change
+         #(reset! task-input (-> % .-target .-value))
+         :on-key-up
+         (fn [e]
+           (when (= "Enter" (.-key e))
+             (swap! tasks assoc-in [id :title] @task-input)
+             (reset! edit? false)
+             (reset! task-input "")
+             (.preventDefault e)))}])))
+
+;; ONE ITEM
+(defn one-item [tasks id title done]
+  (let [edit? (r/atom false), title* title]
+    (fn []
+      (prn tasks)
+      [:li
+       [checkbox tasks id]
+       [:label {:on-click #(reset! edit? true)} title*]
+       [delete-task tasks id]
+       (when @edit?
+         [edit-item tasks id edit?])])
+    ))
+
 ;; LIST ITEMS
 (defn task-list-comp [tasks]
-  [:ul
-   (for [[id {done :done title :title}] @tasks]
-     ^{:key id}
-     [:li title
-      [checkbox tasks id]
-      [delete-task tasks id done]])])
+    [:ul
+     (for [[id {done :done title :title}] @tasks]
+       ^{:key id}
+       [one-item tasks id title done])])
 
 ;; INPUT
 (defn task-input-comp [tasks]
@@ -44,13 +73,14 @@
          (fn [e]
            (when (= "Enter" (.-key e))
              (let [id (swap! counter inc)]
+               ;; create item with signature (id {:title :done})
                (swap! tasks assoc id {:title @task-input :done false}))
              (reset! task-input "")
              (.preventDefault e)))} ]])))
 
 ;; MAIN
 (defn home-page []
-  [:div 
+  [:div
    [:h2 "Welcometh to todo-app"]
    [:div
     [task-input-comp (r/cursor app-state [:tasks])]
