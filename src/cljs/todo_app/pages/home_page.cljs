@@ -40,16 +40,16 @@
 
 ;; ONE ITEM
 (defn one-item [tasks id title done]
-  (let [edit? (r/atom false), title* title]
+  (let [edit? (r/atom false), ts (r/cursor tasks [id :title])]
     (fn []
       (prn tasks)
-      [:li
-       [checkbox tasks id]
-       [:label {:on-click #(reset! edit? true)} title*]
-       [delete-task tasks id]
-       (when @edit?
-         [edit-item tasks id edit?])])
-    ))
+      (if @edit?
+        [edit-item tasks id edit?]
+        ;;else
+        [:li
+         [checkbox tasks id]
+         [:label {:on-click #(reset! edit? true)} @ts]
+         [delete-task tasks id]]))))
 
 ;; LIST ITEMS
 (defn task-list-comp [tasks]
