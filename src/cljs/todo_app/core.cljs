@@ -2,7 +2,8 @@
     (:require [reagent.core :as reagent :refer [atom]]
               [secretary.core :as secretary :include-macros true]
               [accountant.core :as accountant]
-              [todo-app.pages.home-page :refer [home-page]]))
+              [todo-app.pages.home-page :refer [home-page]]
+              [cljs.test :refer-macros [deftest is testing run-tests]]))
 
 ;; -------------------------
 ;; Views
