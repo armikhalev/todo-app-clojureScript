@@ -42,7 +42,6 @@
 (defn one-item [tasks id title done]
   (let [edit? (r/atom false), ts (r/cursor tasks [id :title])]
     (fn []
-      (prn tasks)
       (if @edit?
         [edit-item tasks id edit?]
         ;;else
